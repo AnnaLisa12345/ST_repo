@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinkholes Dashboard</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🕳️ Sinkholes Dashboard</h1>
+                <p class="subtitle">Global Monitoring System</p>
+            </div>
+            
+            <!-- Statistics Section -->
+            <div class="statistics-section">
+                <h2>📊 Statistics</h2>
+                
+                <div class="stat-card">
+                    <div class="stat-label">Total Sinkholes</div>
+                    <div class="stat-value" id="total-count">-</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">Active Sinkholes</div>
+                    <div class="stat-value" id="active-count">-</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">Average Diameter</div>
+                    <div class="stat-value" id="avg-diameter">-</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">Average Depth</div>
+                    <div class="stat-value" id="avg-depth">-</div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Risk Level Distribution</h3>
+                    <div id="risk-chart"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Geological Type Distribution</h3>
+                    <div id="geological-chart"></div>
+                </div>
+            </div>
+            
+            <!-- Layer Controls -->
+            <div class="layer-controls">
+                <h2>🗺️ Layer Controls</h2>
+                
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="layer-all" checked>
+                        <span>Show All Sinkholes</span>
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Filter by Risk Level</h3>
+                    <label>
+                        <input type="checkbox" class="risk-filter" value="LOW" checked>
+                        <span class="risk-low">Low Risk</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" class="risk-filter" value="MEDIUM" checked>
+                        <span class="risk-medium">Medium Risk</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" class="risk-filter" value="HIGH" checked>
+                        <span class="risk-high">High Risk</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" class="risk-filter" value="CRITICAL" checked>
+                        <span class="risk-critical">Critical Risk</span>
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Filter by Type</h3>
+                    <label>
+                        <input type="checkbox" class="type-filter" value="KARST" checked>
+                        <span>Karst</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" class="type-filter" value="DISSOLUTION" checked>
+                        <span>Dissolution</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" class="type-filter" value="SUBSIDENCE" checked>
+                        <span>Subsidence</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" class="type-filter" value="COLLAPSE" checked>
+                        <span>Collapse</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" class="type-filter" value="ANTHROPOGENIC" checked>
+                        <span>Anthropogenic</span>
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="filter-active" checked>
+                        <span>Show Active Only</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-legend">
+                <h3>Legend</h3>
+                <div class="legend-item">
+                    <span class="legend-marker risk-low-marker"></span>
+                    <span>Low Risk</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker risk-medium-marker"></span>
+                    <span>Medium Risk</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker risk-high-marker"></span>
+                    <span>High Risk</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-marker risk-critical-marker"></span>
+                    <span>Critical Risk</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    
+    <!-- Custom JS -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
