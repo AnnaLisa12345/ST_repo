@@ -162,6 +162,12 @@ function displayMarkers() {
         marker.addTo(map);
         markers.push(marker);
     });
+    
+    // Auto-zoom to fit all markers
+    if (markers.length > 0) {
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
 }
 
 // Set up event listeners
