@@ -70,14 +70,25 @@ function createMarker(sinkhole) {
 // Fetch sinkholes from API
 async function fetchSinkholes() {
     try {
+        // Try to fetch from API first
         const response = await fetch(`${API_BASE_URL}/sinkholes/`);
         if (!response.ok) throw new Error('Failed to fetch sinkholes');
         const data = await response.json();
         allSinkholes = data;
         displayMarkers();
     } catch (error) {
-        console.error('Error fetching sinkholes:', error);
-        alert('Failed to load sinkhole data. Make sure the backend server is running.');
+        console.log('API not available, trying static data...');
+        // Fallback to static JSON file for GitHub Pages deployment
+        try {
+            const response = await fetch('sinkholes-data.json');
+            if (!response.ok) throw new Error('Failed to fetch static data');
+            const data = await response.json();
+            allSinkholes = data;
+            displayMarkers();
+        } catch (staticError) {
+            console.error('Error fetching sinkholes:', error);
+            alert('Failed to load sinkhole data. Make sure the backend server is running or static data is available.');
+        }
     }
 }
 
