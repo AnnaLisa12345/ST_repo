@@ -8,15 +8,21 @@ let allSinkholes = [];
 
 // Risk level colors
 const RISK_COLORS = {
+    'low': '#4caf50',
     'LOW': '#4caf50',
+    'medium': '#ff9800',
     'MEDIUM': '#ff9800',
+    'high': '#ff5722',
     'HIGH': '#ff5722',
+    'critical': '#f44336',
     'CRITICAL': '#f44336'
 };
 
 // Initialize the map
 function initMap() {
-    map = L.map('map').setView([20, 0], 2);
+    // Center on Rome, Italy where the detected sinkholes are located
+    map = L.map('map').setView([41.90, 12.50], 12);
+    // map = L.map('map').setView([20, 0], 2); //center = world view
     
     // Add dark theme tile layer
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -139,23 +145,31 @@ function displayMarkers() {
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
     
+    console.log('Total sinkholes loaded:', allSinkholes.length);
+    
     // Get filter settings
     const showAll = document.getElementById('layer-all').checked;
     const activeOnly = document.getElementById('filter-active').checked;
     
     const riskFilters = Array.from(document.querySelectorAll('.risk-filter:checked'))
-        .map(cb => cb.value);
+        .map(cb => cb.value.toLowerCase());
     const typeFilters = Array.from(document.querySelectorAll('.type-filter:checked'))
         .map(cb => cb.value);
+    
+    console.log('Show all:', showAll, 'Active only:', activeOnly);
+    console.log('Risk filters:', riskFilters);
+    console.log('Type filters:', typeFilters);
     
     // Filter and display sinkholes
     const filteredSinkholes = allSinkholes.filter(sinkhole => {
         if (!showAll) return false;
         if (activeOnly && !sinkhole.is_active) return false;
-        if (!riskFilters.includes(sinkhole.risk_level)) return false;
-        if (!typeFilters.includes(sinkhole.geological_type)) return false;
+        if (sinkhole.risk_level && !riskFilters.includes(sinkhole.risk_level.toLowerCase())) return false;
+        if (sinkhole.geological_type && !typeFilters.includes(sinkhole.geological_type)) return false;
         return true;
     });
+    
+    console.log('Filtered sinkholes:', filteredSinkholes.length);
     
     filteredSinkholes.forEach(sinkhole => {
         const marker = createMarker(sinkhole);
