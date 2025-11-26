@@ -226,11 +226,53 @@ function displayMarkers() {
         markers.push(marker);
     });
     
+    // Update statistics based on filtered sinkholes
+    updateStatisticsForFiltered(filteredSinkholes);
+    
     // Auto-zoom to fit all markers
     if (markers.length > 0) {
         const group = new L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.1));
     }
+}
+
+// Update statistics based on currently filtered sinkholes
+function updateStatisticsForFiltered(sinkholes) {
+    if (!sinkholes || sinkholes.length === 0) {
+        // Show zeros if no sinkholes are visible
+        document.getElementById('total-count').textContent = '0';
+        document.getElementById('active-count').textContent = '0';
+        document.getElementById('avg-diameter').textContent = '0m';
+        document.getElementById('avg-depth').textContent = '0m';
+        document.getElementById('risk-chart').innerHTML = '<p style="color: #999;">No data</p>';
+        document.getElementById('geological-chart').innerHTML = '<p style="color: #999;">No data</p>';
+        return;
+    }
+    
+    const stats = {
+        total_count: sinkholes.length,
+        active_count: sinkholes.filter(s => s.is_active).length,
+        average_diameter: (sinkholes.reduce((sum, s) => sum + (s.diameter || 0), 0) / sinkholes.length).toFixed(1),
+        average_depth: (sinkholes.reduce((sum, s) => sum + (s.depth || 0), 0) / sinkholes.length).toFixed(1),
+        risk_distribution: [],
+        geological_distribution: []
+    };
+    
+    // Calculate risk distribution
+    const riskCounts = {};
+    const geoCounts = {};
+    
+    sinkholes.forEach(s => {
+        const risk = (s.risk_level || 'unknown').toUpperCase();
+        const geo = s.geological_type || 'unknown';
+        riskCounts[risk] = (riskCounts[risk] || 0) + 1;
+        geoCounts[geo] = (geoCounts[geo] || 0) + 1;
+    });
+    
+    stats.risk_distribution = Object.entries(riskCounts).map(([risk_level, count]) => ({ risk_level, count }));
+    stats.geological_distribution = Object.entries(geoCounts).map(([geological_type, count]) => ({ geological_type, count }));
+    
+    displayStatistics(stats);
 }
 
 // Set up event listeners
