@@ -71,22 +71,28 @@ function createMarker(sinkhole) {
 async function fetchSinkholes() {
     try {
         // Try to fetch from API first
+        console.log('Attempting to fetch from API:', `${API_BASE_URL}/sinkholes/`);
         const response = await fetch(`${API_BASE_URL}/sinkholes/`);
         if (!response.ok) throw new Error('Failed to fetch sinkholes');
         const data = await response.json();
+        console.log('Successfully loaded data from API:', data.length, 'sinkholes');
         allSinkholes = data;
         displayMarkers();
     } catch (error) {
-        console.log('API not available, trying static data...');
+        console.log('API not available, trying static data...', error.message);
         // Fallback to static JSON file for GitHub Pages deployment
         try {
+            console.log('Fetching static data from: sinkholes-data.json');
             const response = await fetch('sinkholes-data.json');
+            console.log('Static data response status:', response.status, response.ok);
             if (!response.ok) throw new Error('Failed to fetch static data');
             const data = await response.json();
+            console.log('Successfully loaded static data:', data.length, 'sinkholes');
             allSinkholes = data;
             displayMarkers();
         } catch (staticError) {
-            console.error('Error fetching sinkholes:', error);
+            console.error('Error fetching static data:', staticError);
+            console.error('Original API error:', error);
             alert('Failed to load sinkhole data. Make sure the backend server is running or static data is available.');
         }
     }
@@ -100,8 +106,40 @@ async function fetchStatistics() {
         const data = await response.json();
         displayStatistics(data);
     } catch (error) {
-        console.error('Error fetching statistics:', error);
+        console.log('API statistics not available, calculating from loaded data...');
+        // Calculate statistics from loaded sinkholes
+        if (allSinkholes && allSinkholes.length > 0) {
+            calculateStatistics();
+        }
     }
+}
+
+// Calculate statistics from loaded sinkhole data
+function calculateStatistics() {
+    const stats = {
+        total_count: allSinkholes.length,
+        active_count: allSinkholes.filter(s => s.is_active).length,
+        average_diameter: (allSinkholes.reduce((sum, s) => sum + (s.diameter || 0), 0) / allSinkholes.length).toFixed(1),
+        average_depth: (allSinkholes.reduce((sum, s) => sum + (s.depth || 0), 0) / allSinkholes.length).toFixed(1),
+        risk_distribution: [],
+        geological_distribution: []
+    };
+    
+    // Calculate risk distribution
+    const riskCounts = {};
+    const geoCounts = {};
+    
+    allSinkholes.forEach(s => {
+        const risk = (s.risk_level || 'unknown').toUpperCase();
+        const geo = s.geological_type || 'unknown';
+        riskCounts[risk] = (riskCounts[risk] || 0) + 1;
+        geoCounts[geo] = (geoCounts[geo] || 0) + 1;
+    });
+    
+    stats.risk_distribution = Object.entries(riskCounts).map(([risk_level, count]) => ({ risk_level, count }));
+    stats.geological_distribution = Object.entries(geoCounts).map(([geological_type, count]) => ({ geological_type, count }));
+    
+    displayStatistics(stats);
 }
 
 // Display statistics
